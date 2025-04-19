@@ -3,7 +3,7 @@ import React from "react";
 
 type InputErrorProps = {
     children: React.ReactNode;
-    className: React.HTMLProps<HTMLElement>["className"];
+    className?: React.HTMLProps<HTMLElement>["className"];
 };
 
 export default function InputError({ children, className }: InputErrorProps) {
