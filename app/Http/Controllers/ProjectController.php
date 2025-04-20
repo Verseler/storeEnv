@@ -16,7 +16,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::where('user_id', Auth::id())->get();
+        $projects = Project::with('envVariables')->where('user_id', Auth::id())->get();
 
         return Inertia::render('HomePage', [
             'projects' => $projects
@@ -93,5 +93,7 @@ class ProjectController extends Controller
     public function destroy(string $id)
     {
         Project::findOrFail($id)->delete();
+
+        return redirect()->route('login')->with('success', 'Successfully deleted project.');
     }
 }

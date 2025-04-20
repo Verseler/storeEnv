@@ -5,14 +5,30 @@ import SearchBar from "@/Components/SearchBar";
 import { H2 } from "@/Components/Typography";
 import LinkButton from "@/Components/LinkButton";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Project } from "@/Features/project/project.types";
+import type { Project } from "@/Features/project/project.types";
+import ConfirmationDialog from "@/Components/ConfirmationDialog";
+import { router } from "@inertiajs/react";
+import ProjectDetailSheet from "@/Features/project/ProjectDetailSheet";
 
 type HomePageProps = {
     projects: Project[];
 };
 
 export default function HomePage({ projects = [] }: HomePageProps) {
+    const [selectedProject, setSelectedProject] = useState<Project | undefined>(
+        undefined
+    );
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [deleteConfirmation, setDeleteConfirmation] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+
+    function deleteProject() {
+        if (!selectedProject || !selectedProject.id) return;
+
+        router.visit(route("project.destroy", { id: selectedProject.id }), {
+            method: "delete",
+        });
+    }
 
     const filteredProjects = searchQuery
         ? projects.filter(
@@ -50,15 +66,37 @@ export default function HomePage({ projects = [] }: HomePageProps) {
                         {filteredProjects.map((project) => (
                             <ProjectCard
                                 key={project.id}
-                                id={project.id}
                                 name={project.name}
                                 description={project.description}
-                                envs={project.envs}
+                                envs={project.env_variables}
+                                onView={() => {
+                                    setSelectedProject(project);
+                                    setIsSheetOpen(true);
+                                }}
+                                onDelete={() => {
+                                    setSelectedProject(project);
+                                    setDeleteConfirmation(true);
+                                }}
                             />
                         ))}
                     </div>
                 )}
             </div>
+
+            <ConfirmationDialog
+                open={deleteConfirmation}
+                onOpenChange={setDeleteConfirmation}
+                onConfirm={deleteProject}
+                variant="destructive"
+                confirmLabel="Delete Project"
+                title="Are you sure you want to delete this project?"
+                description="Once this project is deleted, all of its env text and files will be permanently deleted."
+            />
+            <ProjectDetailSheet
+                project={selectedProject}
+                open={isSheetOpen}
+                onOpenChange={setIsSheetOpen}
+            />
         </AuthenticatedLayout>
     );
 }

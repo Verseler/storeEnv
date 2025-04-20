@@ -1,6 +1,5 @@
 import {
     Card,
-    CardContent,
     CardDescription,
     CardFooter,
     CardHeader,
@@ -15,25 +14,24 @@ import {
 } from "@/Components/ui/dropdown-menu";
 import { Button } from "@/Components/ui/button";
 import { MoreHorizontalIcon } from "lucide-react";
-import { Badge } from "@/Components/ui/badge";
-import type { Env } from "@/Features/project/project.types";
-import { Link } from "@inertiajs/react";
+import type { EnvVariable } from "@/Features/project/project.types";
 
 type ProjectCardProps = {
-    id: number;
     name: string;
     description: string;
-    envs: Env[];
+    envs: EnvVariable[];
+    onDelete: () => void;
+    onView: () => void;
 };
 
 export default function ProjectCard({
-    id,
     description,
     name,
-    envs,
+    onDelete,
+    onView,
 }: ProjectCardProps) {
     return (
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden shadow-sm">
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div>
@@ -42,7 +40,7 @@ export default function ProjectCard({
                             {description}
                         </CardDescription>
                     </div>
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
                             <Button
                                 variant="ghost"
@@ -54,21 +52,15 @@ export default function ProjectCard({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit project</DropdownMenuItem>
-                            <DropdownMenuItem>
-                                Duplicate project
+                            <DropdownMenuItem onClick={onView}>
+                                View
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">
-                                <Link
-                                    href={route("project.destroy", {
-                                        id: id,
-                                    })}
-                                    method="delete"
-                                    as="button"
-                                >
-                                    Delete project
-                                </Link>
+                            <DropdownMenuItem
+                                onClick={onDelete}
+                                className="text-destructive"
+                            >
+                                Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
